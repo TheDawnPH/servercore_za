@@ -2,11 +2,6 @@ package net.thedawnph.servercore_za;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.Bukkit;
-
-import java.io.IOException;
-import java.util.Objects;
 import java.util.logging.Logger;
 
 
@@ -44,7 +39,7 @@ public final class Servercore_za extends JavaPlugin {
 
     private void registerEvents() {
         getServer().getPluginManager().registerEvents(new ZombieKill(), this);
-        getServer().getPluginManager().registerEvents(new DisableMonsters(), this);
+        // getServer().getPluginManager().registerEvents(new DisableMonsters(), this); // working in progress
         getServer().getPluginManager().registerEvents(new StartNighttimeTask(), this);
     }
 }
