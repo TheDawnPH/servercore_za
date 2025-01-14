@@ -3,40 +3,84 @@ package net.thedawnph.servercore_za;
 import com.ericdebouwer.zombieapocalypse.api.ApocalypseAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.event.Listener;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Objects;
 
-public class StartNighttimeTask implements Listener {
-    private FileConfiguration getConfig() {
-        return JavaPlugin.getPlugin(Servercore_za.class).getConfig();
+public class StartNighttimeTask {
+
+    private final ApocalypseAPI apocalypseAPI = ApocalypseAPI.getInstance();
+    private final JavaPlugin plugin;
+    private boolean isApocalyptic = false;
+
+    public StartNighttimeTask(JavaPlugin plugin) {
+        this.plugin = plugin;
+        startScheduler();
     }
-    ApocalypseAPI apocalypseAPI = ApocalypseAPI.getInstance();
-    boolean isApocalyptic = apocalypseAPI.isApocalypse(Objects.requireNonNull(getConfig().getString("worldname")));
 
-    public StartNighttimeTask() {
-        Bukkit.getScheduler().runTaskTimer(Servercore_za.getPlugin(Servercore_za.class), () -> {
-            World world = Bukkit.getWorld(Objects.requireNonNull(getConfig().getString("worldname")));
+    private void startScheduler() {
+        Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+            String worldName = plugin.getConfig().getString("worldname");
+            if (worldName == null) {
+                Bukkit.getLogger().severe("No worldname specified in the configuration!");
+                return;
+            }
+
+            World world = Bukkit.getWorld(worldName);
             if (world == null) {
-                Bukkit.getLogger().severe("World not found!");
+                Bukkit.getLogger().severe("World not found: " + worldName);
                 return;
             }
 
             long time = world.getTime();
 
             // Check if it is nighttime
-            if (time >= 13000) {
-                if (!isApocalyptic) {
-                    // Play bell sound for all players
-                    Bukkit.getOnlinePlayers().forEach(player ->
-                            player.playSound(player.getLocation(), "event.raid.horn", 1.0f, 1.0f)
-                    );
-                    apocalypseAPI.startApocalypse(Objects.requireNonNull(getConfig().getString("worldname")), getConfig().getInt("ZA-duration"), getConfig().getInt("ZA-mobs"), true);
+            if (time >= 12541 && time <= 23458) {
+                if (!Bukkit.getOnlinePlayers().isEmpty() && !isApocalyptic) {
+                    // Play raid horn sound for all players
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        player.playSound(player.getLocation(), "item.goat_horn.sound.5", 16.0f, 1.0f);
+                    }
+
+                    long duration = 0;
+                    if (plugin.getConfig().getInt("ZA-duration") == 0) {
+                        // Start the apocalypse
+                        apocalypseAPI.startApocalypse(
+                                worldName, true
+                        );
+                    } else {
+                        // Start the apocalypse
+                        apocalypseAPI.startApocalypse(
+                                worldName,
+                                plugin.getConfig().getInt("ZA-duration"),
+                                plugin.getConfig().getInt("ZA-mobs"),
+                                true
+                        );
+                    }
+
+
+                    isApocalyptic = true;
+                }
+            } else {
+                if (isApocalyptic) {
+                    // End the apocalypse
+                    apocalypseAPI.endApocalypse(worldName, true);
+
+                    // Play raid horn sound for all players
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        player.playSound(player.getLocation(), "item.goat_horn.sound.3", 16.0f, 1.0f);
+                    }
+
+                    // Remove all dropped items from the world
+                    world.getEntities().stream()
+                            .filter(entity -> entity instanceof Item)
+                            .forEach(Entity::remove);
+
+                    isApocalyptic = false;
                 }
             }
-        }, 0, 13000L);
+        }, 0L, 40L); // Run every 2 seconds
     }
 }
-

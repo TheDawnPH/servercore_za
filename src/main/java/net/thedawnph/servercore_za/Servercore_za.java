@@ -33,6 +33,8 @@ public final class Servercore_za extends JavaPlugin {
     @Override
     public void onDisable()
     {
+        // reset scheduler
+        getServer().getScheduler().cancelTasks(this);
         LOGGER.info("ZA ServerCore disabled");
     }
 
@@ -40,6 +42,7 @@ public final class Servercore_za extends JavaPlugin {
     private void registerEvents() {
         getServer().getPluginManager().registerEvents(new ZombieKill(), this);
         // getServer().getPluginManager().registerEvents(new DisableMonsters(), this); // working in progress
-        getServer().getPluginManager().registerEvents(new StartNighttimeTask(), this);
+        getServer().getPluginManager().registerEvents(new OneNightSleep(), this);
+        new StartNighttimeTask(this);
     }
 }
