@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="servercore_za:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/servercore_za_jar</output-path>
+    <root id="archive" name="servercore_za.jar">
+      <element id="module-output" name="servercore_za" />
+      <element id="file-copy" path="$PROJECT_DIR$/src/main/resources/plugin.yml" />
+    </root>
+  </artifact>
+</component>
