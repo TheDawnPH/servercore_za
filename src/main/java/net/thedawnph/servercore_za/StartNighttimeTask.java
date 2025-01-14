@@ -4,11 +4,13 @@ import com.ericdebouwer.zombieapocalypse.api.ApocalypseAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 
+import java.util.Objects;
+
 public class StartNighttimeTask implements Listener {
+    ApocalypseAPI apocalypseAPI = ApocalypseAPI.getInstance();
     public StartNighttimeTask() {
         Bukkit.getScheduler().runTaskTimer(Servercore_za.getPlugin(Servercore_za.class), () -> {
-            ApocalypseAPI apocalypseAPI = ApocalypseAPI.getInstance();
-            long time = Bukkit.getWorlds().getFirst().getTime(); // Get the time of the first world
+            long time = Objects.requireNonNull(Bukkit.getWorld("world")).getTime();
             if (time >= 13000 && time <= 23000) { // Check if it is nighttime
                 boolean isApocalyptic = apocalypseAPI.isApocalypse("world");
                 if (isApocalyptic) {
