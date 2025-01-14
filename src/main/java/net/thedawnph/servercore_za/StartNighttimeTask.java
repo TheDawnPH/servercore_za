@@ -15,6 +15,10 @@ public class StartNighttimeTask {
     private final JavaPlugin plugin;
     private boolean isApocalyptic = false;
 
+    public static int randomizer(int min, int max) {
+        return (int) ((Math.random() * (max - min)) + min);
+    }
+
     public StartNighttimeTask(JavaPlugin plugin) {
         this.plugin = plugin;
         startScheduler();
@@ -36,21 +40,22 @@ public class StartNighttimeTask {
 
             long time = world.getTime();
 
+
             // Check if it is nighttime
             if (time >= 12541 && time <= 23458) {
+                int random = randomizer(0, 4);
                 if (!Bukkit.getOnlinePlayers().isEmpty() && !isApocalyptic) {
-                    // Play raid horn sound for all players
-                    for (Player player : Bukkit.getOnlinePlayers()) {
-                        player.playSound(player.getLocation(), "item.goat_horn.sound.5", 16.0f, 1.0f);
-                    }
-
-                    long duration = 0;
-                    if (plugin.getConfig().getInt("ZA-duration") == 0) {
+                    if (plugin.getConfig().getInt("ZA-duration") == 0 && random == 1) {
                         // Start the apocalypse
                         apocalypseAPI.startApocalypse(
                                 worldName, true
                         );
-                    } else {
+
+                        // Play raid horn sound for all players
+                        for (Player player : Bukkit.getOnlinePlayers()) {
+                            player.playSound(player.getLocation(), "item.goat_horn.sound.5", 16.0f, 1.0f);
+                        }
+                    } else if (plugin.getConfig().getInt("ZA-duration") != 0 && random == 1) {
                         // Start the apocalypse
                         apocalypseAPI.startApocalypse(
                                 worldName,
@@ -58,8 +63,17 @@ public class StartNighttimeTask {
                                 plugin.getConfig().getInt("ZA-mobs"),
                                 true
                         );
-                    }
 
+                        // Play raid horn sound for all players
+                        for (Player player : Bukkit.getOnlinePlayers()) {
+                            player.playSound(player.getLocation(), "item.goat_horn.sound.5", 16.0f, 1.0f);
+                        }
+                    } else if (random != 1) {
+                        // send message to all players
+                        for (Player player : Bukkit.getOnlinePlayers()) {
+                            player.sendMessage("The night is quiet...");
+                        }
+                    }
 
                     isApocalyptic = true;
                 }
