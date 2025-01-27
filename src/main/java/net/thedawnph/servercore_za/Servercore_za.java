@@ -1,7 +1,11 @@
 package net.thedawnph.servercore_za;
 
+import net.thedawnph.servercore_za.Commands.AboutZA;
+import net.thedawnph.servercore_za.Commands.SpawnEvent;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Objects;
 import java.util.logging.Logger;
 
 
@@ -44,5 +48,8 @@ public final class Servercore_za extends JavaPlugin {
         // getServer().getPluginManager().registerEvents(new DisableMonsters(), this); // working in progress
         getServer().getPluginManager().registerEvents(new OneNightSleep(), this);
         new StartNighttimeTask(this);
+        // commands
+        Objects.requireNonNull(this.getCommand("spawn")).setExecutor(new SpawnEvent());
+        Objects.requireNonNull(this.getCommand("aboutza")).setExecutor(new AboutZA());
     }
 }

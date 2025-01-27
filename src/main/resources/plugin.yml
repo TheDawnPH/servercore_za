@@ -1,8 +1,15 @@
 name: servercore_za
-version: '1.1.2'
+version: '2.0.0'
 main: net.thedawnph.servercore_za.Servercore_za
 api-version: '1.20'
 authors: [ princepines ]
 description: Server Core for TheDawnPH Zombie Apocalypse
 website: https://thedawnph.net
-depend: [ZombieApocalypse]
+depend: [ ZombiesPlugin, QualityArmory ]
+commands:
+  spawn:
+    description: Teleport to Spawn
+    usage: /spawn
+  aboutza:
+    description: About TheDawnPH Zombie Apocalypse
+    usage: /aboutza

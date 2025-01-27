@@ -1,6 +1,6 @@
 worldname: "world" # Name of the world to spawn zombies in
-ZA-duration: 7 # In minutes, default is 7 minutes (or 1 minecraft night)
-ZA-mobs: 2 # Number of mobs to spawn per chunk, default is 2,  ZA-duration must be configured
+max-zombies: 50 # Maximum amount of zombies to spawn
+radius: 100 # Radius around the player to spawn zombies
 zombie-drops:
   - "IRON_INGOT"
   - "GOLD_INGOT"

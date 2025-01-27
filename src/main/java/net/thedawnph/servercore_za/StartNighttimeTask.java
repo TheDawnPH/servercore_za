@@ -1,6 +1,5 @@
 package net.thedawnph.servercore_za;
 
-import com.ericdebouwer.zombieapocalypse.api.ApocalypseAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -11,9 +10,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class StartNighttimeTask {
 
-    private final ApocalypseAPI apocalypseAPI = ApocalypseAPI.getInstance();
     private final JavaPlugin plugin;
-    private boolean isApocalyptic = false;
+    public boolean isApocalyptic = false;
 
     public static int randomizer(int min, int max) {
         return (int) ((Math.random() * (max - min)) + min);
@@ -43,32 +41,28 @@ public class StartNighttimeTask {
 
             // Check if it is nighttime
             if (time >= 12541 && time <= 23458) {
-                int random = randomizer(0, 4);
+                int random = randomizer(0, 2);
                 if (!Bukkit.getOnlinePlayers().isEmpty() && !isApocalyptic) {
-                    if (plugin.getConfig().getInt("ZA-duration") == 0 && random == 1) {
+                    if (random == 1) {
                         // Start the apocalypse
-                        apocalypseAPI.startApocalypse(
-                                worldName, true
-                        );
+                        isApocalyptic = true;
 
                         // Play raid horn sound for all players
                         for (Player player : Bukkit.getOnlinePlayers()) {
                             player.playSound(player.getLocation(), "item.goat_horn.sound.5", 16.0f, 1.0f);
                         }
-                    } else if (plugin.getConfig().getInt("ZA-duration") != 0 && random == 1) {
-                        // Start the apocalypse
-                        apocalypseAPI.startApocalypse(
-                                worldName,
-                                plugin.getConfig().getInt("ZA-duration"),
-                                plugin.getConfig().getInt("ZA-mobs"),
-                                true
-                        );
 
-                        // Play raid horn sound for all players
+                        // spawn zombies around players in the world with a radius set on config
+                        int radius = plugin.getConfig().getInt("zombie-radius");
+                        int amount = plugin.getConfig().getInt("zombie-amount");
                         for (Player player : Bukkit.getOnlinePlayers()) {
-                            player.playSound(player.getLocation(), "item.goat_horn.sound.5", 16.0f, 1.0f);
+                            for (int mobs = 0; mobs < amount; mobs++) {
+                                int x = randomizer(10, radius);
+                                int z = randomizer(10, radius);
+                                world.spawnEntity(player.getLocation().add(x, world.getHighestBlockYAt(x, z), z), org.bukkit.entity.EntityType.ZOMBIE);
+                            }
                         }
-                    } else if (random != 1) {
+                    } else {
                         // send message to all players
                         for (Player player : Bukkit.getOnlinePlayers()) {
                             player.sendMessage("The night is quiet...");
@@ -79,12 +73,14 @@ public class StartNighttimeTask {
                 }
             } else {
                 if (isApocalyptic) {
-                    // End the apocalypse
-                    apocalypseAPI.endApocalypse(worldName, true);
+                    // kill all zombies
+                    world.getEntities().stream()
+                            .filter(entity -> entity.getType().name().equals("ZOMBIE"))
+                            .forEach(Entity::remove);
 
                     // Play raid horn sound for all players
                     for (Player player : Bukkit.getOnlinePlayers()) {
-                        player.playSound(player.getLocation(), "item.goat_horn.sound.3", 16.0f, 1.0f);
+                        player.playSound(player.getLocation(), "item.goat_horn.sound.6", 16.0f, 1.0f);
                     }
 
                     // Remove all dropped items from the world
